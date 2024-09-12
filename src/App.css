@@ -39,6 +39,7 @@ body {
   color: rgb(223, 41, 41);
 }
 
+
 /* Text message container */
 .message-container {
   margin-bottom: 20px;
@@ -69,4 +70,17 @@ body {
 /* Button hover effect */
 .button-container button:hover {
   background-color: #555; /* Lighter background on hover */
+}
+
+.button-container .answer-disabled {
+  background-color: #333;
+  color: #333;
+  opacity: 50%;
+  pointer-events: none;
+}
+
+.button-container .next-disabled {
+  background-color: #121212;
+  color: #121212;
+  pointer-events: none;
 }

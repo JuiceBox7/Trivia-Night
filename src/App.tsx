@@ -1,6 +1,5 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import "./App.css";
-import notify, { answerSelected } from "./events.ts";
 
 // --- Constants & Globals ---
 const correct = "Correct!";
@@ -10,13 +9,15 @@ export let res = "";
 // --- React Functions ---
 function Answer({
   value,
+  name,
   onAnswerSelect,
 }: {
   value: string;
+  name: string;
   onAnswerSelect: React.MouseEventHandler;
 }) {
   return (
-    <button className="answer" onClick={onAnswerSelect}>
+    <button className={name} onClick={onAnswerSelect}>
       {value}
     </button>
   );
@@ -37,9 +38,11 @@ function Result({ value }: { value: string }) {
 
 function Choices({
   choices,
+  answerClass,
   onChoiceSelect,
 }: {
   choices: string[];
+  answerClass: string;
   onChoiceSelect: any;
 }) {
   function handleClick(i: number) {
@@ -49,12 +52,39 @@ function Choices({
   return (
     <>
       <div className="button-container">
-        <Answer value={choices[0]} onAnswerSelect={() => handleClick(0)} />
-        <Answer value={choices[1]} onAnswerSelect={() => handleClick(1)} />
-        <Answer value={choices[2]} onAnswerSelect={() => handleClick(2)} />
-        <Answer value={choices[3]} onAnswerSelect={() => handleClick(3)} />
+        <Answer
+          value={choices[0]}
+          name={answerClass}
+          onAnswerSelect={() => handleClick(0)}
+        />
+        <Answer
+          value={choices[1]}
+          name={answerClass}
+          onAnswerSelect={() => handleClick(1)}
+        />
+        <Answer
+          value={choices[2]}
+          name={answerClass}
+          onAnswerSelect={() => handleClick(2)}
+        />
+        <Answer
+          value={choices[3]}
+          name={answerClass}
+          onAnswerSelect={() => handleClick(3)}
+        />
       </div>
     </>
+  );
+}
+
+function Next({ isDisabled, onNext }: { isDisabled: boolean; onNext: any }) {
+  const className = isDisabled ? "next-disabled" : "";
+  return (
+    <div className="button-container">
+      <button className={className} disabled={isDisabled} onClick={onNext}>
+        Next
+      </button>
+    </div>
   );
 }
 
@@ -89,20 +119,29 @@ function App() {
   const [question, setQuestion] = useState(() => getQuestion(0));
   const [choices, setChoices] = useState(() => getChoices(question));
   const [answer, setAnswer] = useState(() => getAnswer(question));
+  const [res, setRes] = useState("");
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [answerClass, setAnswerClass] = useState("");
 
-  function handlePlay(choice: string) {
-    res = choice === answer ? correct : incorrect;
-    if (res === correct) {
-    }
-    notify(answerSelected);
+  function goNext() {
     setquestionNum(questionNum + 1);
-    if (questionNum >= 2) return;
-    const nextQuestion = getQuestion(questionNum);
+    const nextQuestion = getQuestion(questionNum + 1);
     const nextChoices = getChoices(nextQuestion);
     const nextAnswer = getAnswer(nextQuestion);
     setQuestion(nextQuestion);
     setChoices(nextChoices);
     setAnswer(nextAnswer);
+    setRes("");
+    setIsDisabled(true);
+    setAnswerClass("");
+  }
+
+  function handlePlay(choice: string) {
+    if (choice === answer) {
+      setRes(correct);
+      setIsDisabled(false);
+      setAnswerClass("answer-disabled");
+    } else setRes(incorrect);
   }
 
   return (
@@ -114,7 +153,13 @@ function App() {
         <Result value={res} />
         <h2>{"Question " + (questionNum + 1)}</h2>
         <Question value={question + "?"} />
-        <Choices choices={choices} onChoiceSelect={handlePlay} />
+        <Choices
+          choices={choices}
+          answerClass={answerClass}
+          onChoiceSelect={handlePlay}
+        />
+        <br />
+        <Next isDisabled={isDisabled} onNext={goNext} />
       </div>
     </>
   );
