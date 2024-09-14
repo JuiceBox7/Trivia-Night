@@ -91,6 +91,7 @@ function App() {
   const [isDisabled, setIsDisabled] = useState(true);
   const [answerClass, setAnswerClass] = useState("");
   const [isCorrect, setIsCorrect] = useState(false);
+  const [selection, setSelection] = useState("");
 
   function setup(question: string, choices: string[], answer: string) {
     setQuestion(question);
@@ -100,6 +101,7 @@ function App() {
     setIsDisabled(true);
     setAnswerClass("");
     setIsCorrect(false);
+    setSelection("");
   }
 
   const goNext = () => {
@@ -119,6 +121,7 @@ function App() {
   };
 
   function handlePlay(choice: string) {
+    setSelection(choice);
     if (choice === answer) {
       console.log(correct);
       setRes(correct);
@@ -145,7 +148,7 @@ function App() {
           {choices.map((choice) => (
             <Answer
               value={choice}
-              name={choice === answer && isCorrect ? "answer-correct" : answerClass}
+              name={choice === answer && isCorrect ? "answer-correct" : choice === selection ? "answer-incorrect" : answerClass}
               onAnswerSelect={() => handlePlay(choice)}
             />
           ))}

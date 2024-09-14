@@ -85,6 +85,12 @@ body {
   pointer-events: none;
 }
 
+.button-container .answer-incorrect {
+  background-color: #a72925;
+  color: #fff;
+  pointer-events: none;
+}
+
 .button-container .next-disabled {
   background-color: #121212;
   color: #121212;
