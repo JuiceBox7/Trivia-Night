@@ -74,8 +74,14 @@ body {
 
 .button-container .answer-disabled {
   background-color: #333;
-  color: #333;
+  color: #7e7e7e;
   opacity: 50%;
+  pointer-events: none;
+}
+
+.button-container .answer-correct {
+  background-color: #25a73a;
+  color: #fff;
   pointer-events: none;
 }
 

@@ -36,53 +36,21 @@ function Result({ value }: { value: string }) {
   return <h2 className={className}>{value}</h2>;
 }
 
-function Choices({
-  choices,
-  answerClass,
-  onChoiceSelect,
+function Next({
+  isCorrect,
+  isDisabled,
+  onNext,
 }: {
-  choices: string[];
-  answerClass: string;
-  onChoiceSelect: any;
+  isCorrect: boolean;
+  isDisabled: boolean;
+  onNext: any;
 }) {
-  function handleClick(i: number) {
-    onChoiceSelect(choices[i]);
-  }
-
-  return (
-    <>
-      <div className="button-container">
-        <Answer
-          value={choices[0]}
-          name={answerClass}
-          onAnswerSelect={() => handleClick(0)}
-        />
-        <Answer
-          value={choices[1]}
-          name={answerClass}
-          onAnswerSelect={() => handleClick(1)}
-        />
-        <Answer
-          value={choices[2]}
-          name={answerClass}
-          onAnswerSelect={() => handleClick(2)}
-        />
-        <Answer
-          value={choices[3]}
-          name={answerClass}
-          onAnswerSelect={() => handleClick(3)}
-        />
-      </div>
-    </>
-  );
-}
-
-function Next({ isDisabled, onNext }: { isDisabled: boolean; onNext: any }) {
   const className = isDisabled ? "next-disabled" : "";
+  const text = isCorrect ? "Next" : "Try Again";
   return (
     <div className="button-container">
       <button className={className} disabled={isDisabled} onClick={onNext}>
-        Next
+        {text}
       </button>
     </div>
   );
@@ -122,26 +90,46 @@ function App() {
   const [res, setRes] = useState("");
   const [isDisabled, setIsDisabled] = useState(true);
   const [answerClass, setAnswerClass] = useState("");
+  const [isCorrect, setIsCorrect] = useState(false);
 
-  function goNext() {
+  function setup(question: string, choices: string[], answer: string) {
+    setQuestion(question);
+    setChoices(choices);
+    setAnswer(answer);
+    setRes("");
+    setIsDisabled(true);
+    setAnswerClass("");
+    setIsCorrect(false);
+  }
+
+  const goNext = () => {
     setquestionNum(questionNum + 1);
     const nextQuestion = getQuestion(questionNum + 1);
     const nextChoices = getChoices(nextQuestion);
     const nextAnswer = getAnswer(nextQuestion);
-    setQuestion(nextQuestion);
-    setChoices(nextChoices);
-    setAnswer(nextAnswer);
-    setRes("");
-    setIsDisabled(true);
-    setAnswerClass("");
-  }
+    setup(nextQuestion, nextChoices, nextAnswer);
+  };
+
+  const tryAgain = () => {
+    setquestionNum(0);
+    const nextQuestion = getQuestion(0);
+    const nextChoices = getChoices(nextQuestion);
+    const nextAnswer = getAnswer(nextQuestion);
+    setup(nextQuestion, nextChoices, nextAnswer);
+  };
 
   function handlePlay(choice: string) {
     if (choice === answer) {
+      console.log(correct);
       setRes(correct);
-      setIsDisabled(false);
-      setAnswerClass("answer-disabled");
-    } else setRes(incorrect);
+      setIsCorrect(true);
+    } else {
+      console.log(incorrect);
+      setRes(incorrect);
+      setIsCorrect(false);
+    }
+    setIsDisabled(false);
+    setAnswerClass("answer-disabled");
   }
 
   return (
@@ -153,13 +141,21 @@ function App() {
         <Result value={res} />
         <h2>{"Question " + (questionNum + 1)}</h2>
         <Question value={question + "?"} />
-        <Choices
-          choices={choices}
-          answerClass={answerClass}
-          onChoiceSelect={handlePlay}
-        />
+        <div className="button-container">
+          {choices.map((choice) => (
+            <Answer
+              value={choice}
+              name={choice === answer && isCorrect ? "answer-correct" : answerClass}
+              onAnswerSelect={() => handlePlay(choice)}
+            />
+          ))}
+        </div>
         <br />
-        <Next isDisabled={isDisabled} onNext={goNext} />
+        <Next
+          isCorrect={isCorrect}
+          isDisabled={isDisabled}
+          onNext={isCorrect ? goNext : tryAgain}
+        />
       </div>
     </>
   );
